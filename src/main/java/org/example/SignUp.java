@@ -30,7 +30,7 @@ public class SignUp extends JFrame {
         JLabel passwordLabel = new JLabel("Password:");
         passwordField = new JPasswordField();
         JLabel roleLabel = new JLabel("Role:");
-        String[] roleOptions = {"student", "admin"};
+        String[] roleOptions = {"student"};
         roleComboBox = new JComboBox<>(roleOptions);
 
         JButton registerButton = new JButton("Register");
