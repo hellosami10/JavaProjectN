@@ -3,6 +3,7 @@ package org.example;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ItemEvent;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -12,41 +13,40 @@ import org.json.JSONObject;
 
 public class SeeHostelApplication extends JFrame {
     private JTable dataTable;
-    private JCheckBox isApproved;
+    private JComboBox<String> statusComboBox;
     private JSONArray bookingsArray;
 
     public SeeHostelApplication() {
         setTitle("Hostel Applications");
-
         setSize(400, 300);
 
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        String[] columnNames = {"Username", "Room ID", "Pricing", "Card Number", "CVV", "Expiry Date", "Is Approved"};
+        String[] columnNames = {"Username", "Room ID", "Pricing", "Card Number", "CVV", "Expiry Date", "Status"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 if (columnIndex == 6) {
-                    return Boolean.class; // Set the column type to Boolean for "Is Approved" column
+                    return String.class; // Set the column type to String for "Status" column
                 }
                 return super.getColumnClass(columnIndex);
             }
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 6; // Allow editing only for the "Is Approved" column
+                return column == 6; // Allow editing only for the "Status" column
             }
         };
         dataTable = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(dataTable);
         panel.add(scrollPane, BorderLayout.CENTER);
 
-        isApproved = new JCheckBox(); // No need to set the label here since it will be shown in the JTable
-        dataTable.getColumnModel().getColumn(6).setCellEditor(new DefaultCellEditor(isApproved)); // Set a checkbox editor for "Is Approved" column
+        statusComboBox = new JComboBox<>(new String[]{"Approve", "Reject"});
+        dataTable.getColumnModel().getColumn(6).setCellEditor(new DefaultCellEditor(statusComboBox));
 
         loadHostelData(model);
-        addCheckBoxListener();
+        addComboBoxListener();
 
         setLocationRelativeTo(null);
         add(panel);
@@ -69,10 +69,12 @@ public class SeeHostelApplication extends JFrame {
                 String cardNumber = bookingObject.getString("cardNumber");
                 String cvv = bookingObject.getString("cvv");
                 String expiryDate = bookingObject.getString("expiryDate");
-                boolean isApprovedValue = bookingObject.getBoolean("isApproved"); // Read the initial value of "isApproved" property
 
-                Object[] rowData = {username, roomId, pricing, cardNumber, cvv, expiryDate, isApprovedValue};
+                String status = bookingObject.optString("isApproved");
+
+                Object[] rowData = {username, roomId, pricing, cardNumber, cvv, expiryDate, status};
                 model.addRow(rowData);
+                statusComboBox.setSelectedItem(status);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -92,29 +94,33 @@ public class SeeHostelApplication extends JFrame {
         }
     }
 
-    private void addCheckBoxListener() {
-        isApproved.addActionListener(e -> {
+    private void addComboBoxListener() {
+        statusComboBox.addActionListener(e -> {
             int selectedRow = dataTable.getSelectedRow();
             if (selectedRow != -1) {
-                boolean isChecked = isApproved.isSelected();
+                String selectedStatus = (String) statusComboBox.getSelectedItem();
                 JSONObject bookingObject = bookingsArray.getJSONObject(selectedRow);
-                bookingObject.put("isApproved", isChecked); // Update the "isApproved" property in the JSON object
+                String previousStatus = bookingObject.optString("isApproved");
 
-                // Write the updated JSON content back to the file
-                try {
-                    Files.write(Paths.get("src/main/java/org/example/bookings.json"), bookingsArray.toString().getBytes());
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+                if (!selectedStatus.equals(previousStatus)) {
+                    bookingObject.put("isApproved", selectedStatus);
 
-                // Show message based on checkbox status
-                if (isChecked) {
-                    JOptionPane.showMessageDialog(this, "Approved");
-                } else {
-                    JOptionPane.showMessageDialog(this, "Rejected");
+                    try {
+                        Files.write(Paths.get("src/main/java/org/example/bookings.json"), bookingsArray.toString().getBytes());
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    if (selectedStatus.startsWith("Approve")) {
+                        JOptionPane.showMessageDialog(this, "Approved");
+                    } else if (selectedStatus.equals("Reject")) {
+                        JOptionPane.showMessageDialog(this, "Rejected");
+                    }
                 }
             }
         });
     }
+
+
 
 }

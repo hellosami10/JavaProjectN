@@ -48,10 +48,8 @@ public class StudentBookHistory extends JFrame {
                     String cardNumber = bookingObject.getString("cardNumber");
                     String cvv = bookingObject.getString("cvv");
                     String expiryDate = bookingObject.getString("expiryDate");
-                    String isApprovedText = "Not Yet";
-                    if(bookingObject.getBoolean("isApproved")) {
-                        isApprovedText = "Approved";
-                    }
+                    String isApprovedText = bookingObject.getString("isApproved");
+
                     Object[] rowData = {SignIn.txtUsername.getText(), roomId, pricing, cardNumber, cvv, expiryDate, isApprovedText};
                     model.addRow(rowData);
                 }

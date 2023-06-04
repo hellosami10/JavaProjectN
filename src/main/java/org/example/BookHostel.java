@@ -185,7 +185,7 @@ public class BookHostel extends JFrame {
         bookingObject.put("cardNumber", cardNumberField.getText());
         bookingObject.put("cvv", cvvField.getText());
         bookingObject.put("expiryDate", expiryDatePicker.getDate().toString());
-        bookingObject.put("isApproved", false);
+        bookingObject.put("isApproved", "Not Yet");
 
         try {
             String jsonContent = new String(Files.readAllBytes(Paths.get("src/main/java/org/example/hostels.json")));
