@@ -41,7 +41,7 @@ public class StudentBookHistory extends JFrame {
 
             for (int i = 0; i < bookingsArray.length(); i++) {
                 JSONObject bookingObject = bookingsArray.getJSONObject(i);
-                if (bookingObject.getString("username").equals(SignIn.txtUsername.getText())) {
+                if (bookingObject.getString("username").equals(SignIn.txtUsername.getText()) && bookingObject.getBoolean("isApproved")) {
                     String roomId = bookingObject.getString("roomId");
                     String roomType = bookingObject.getString("roomType");
                     int pricing = getPricingByRoomType(roomType);
