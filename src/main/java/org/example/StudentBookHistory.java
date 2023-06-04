@@ -21,7 +21,7 @@ public class StudentBookHistory extends JFrame {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        String[] columnNames = {"Username", "Room ID", "Pricing", "Card Number", "CVV", "Expiry Date"};
+        String[] columnNames = {"Username", "Room ID", "Pricing", "Card Number", "CVV", "Expiry Date", "Approval"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         dataTable = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(dataTable);
@@ -41,14 +41,18 @@ public class StudentBookHistory extends JFrame {
 
             for (int i = 0; i < bookingsArray.length(); i++) {
                 JSONObject bookingObject = bookingsArray.getJSONObject(i);
-                if (bookingObject.getString("username").equals(SignIn.txtUsername.getText()) && bookingObject.getBoolean("isApproved")) {
+                if (bookingObject.getString("username").equals(SignIn.txtUsername.getText())) {
                     String roomId = bookingObject.getString("roomId");
                     String roomType = bookingObject.getString("roomType");
                     int pricing = getPricingByRoomType(roomType);
                     String cardNumber = bookingObject.getString("cardNumber");
                     String cvv = bookingObject.getString("cvv");
                     String expiryDate = bookingObject.getString("expiryDate");
-                    Object[] rowData = {SignIn.txtUsername.getText(), roomId, pricing, cardNumber, cvv, expiryDate};
+                    String isApprovedText = "Not Yet";
+                    if(bookingObject.getBoolean("isApproved")) {
+                        isApprovedText = "Approved";
+                    }
+                    Object[] rowData = {SignIn.txtUsername.getText(), roomId, pricing, cardNumber, cvv, expiryDate, isApprovedText};
                     model.addRow(rowData);
                 }
             }
