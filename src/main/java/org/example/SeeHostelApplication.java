@@ -50,7 +50,7 @@ public class SeeHostelApplication extends JFrame {
                 String cardNumber = bookingObject.getString("cardNumber");
                 String cvv = bookingObject.getString("cvv");
                 String expiryDate = bookingObject.getString("expiryDate");
-                Object[] rowData = {SignIn.txtUsername.getText(), roomId, pricing, cardNumber, cvv, expiryDate};
+                Object[] rowData = {username, roomId, pricing, cardNumber, cvv, expiryDate};
                 model.addRow(rowData);
             }
         } catch (IOException e) {
